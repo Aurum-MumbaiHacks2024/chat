@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Index{% endblock %}
+
+{% block body %}
+
+<div class="self-center pt-20 flex flex-col h-full w-full max-w-md px-6 gap-6 items-center">
+    <form method="post" enctype="multipart/form-data" class="flex flex-col w-full bg-surface bg-opacity-20 items-center rounded-lg p-4">
+        {% csrf_token %} 
+        <p class="font-medium text-xl">To get started, please <span class="text-surface dark:text-accent_dark"><a href="{% url 'signup' %}">signup</a></span></p>
+        <p class="font-medium text-lg mb-10">or go back <span class="text-surface dark:text-accent_dark"><a href="{% url 'index' %}">to home</a></span>:</p>
+        {% if messages %}
+            {% for message in messages %}
+                <p class="font-bold text-red-800 mb-4">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        <div class="mb-3">
+            <p class="font-serif text-2xl">Name</p>
+            <input type="name" name="name" class="bg-gray-300 text-xl p-2 px-6 rounded-full" id="name" placeholder="Your Name" required>    
+        </div>
+        <div class="mb-3">
+            <p class="font-serif text-2xl">Username</p>
+            <input type="username" name="username" class="bg-gray-300 text-xl p-2 px-6 rounded-full" id="email" placeholder="A unique username" required>    
+        </div>
+        <div class="mb-3">
+            <p class="font-serif text-2xl">Password</p>
+            <input type="password" name="password" class="bg-gray-300 text-xl p-2 px-6 rounded-full" id="password" placeholder="Your Password" required>
+        </div>
+        <div class="mb-3">
+            <p class="font-serif text-2xl">Confirm Password</p>
+            <input type="password" name="confirm_password" class="bg-gray-300 text-xl p-2 px-6 rounded-full" id="confirm_password" placeholder="Your Password, again" required>
+        </div>
+        <button type="submit" class="bg-accent bg-opacity-75 dark:bg-accent_dark font-bold text-xl p-3 px-8 text-white rounded-full mt-2">Submit</button>
+    </form>
+</div>
+<div class="self-center flex flex-row w-full bg-surface items-center justify-between p-2 px-6">
+    <p class="p-6 w-full text-accent_dark text-center text-2xl font-medium font-serif">Already have an account? <span class="font-sans font-bold"><a class="text-accent_dark" href="{% url 'login' %}">Login</a></span></p>
+</div>
+{% endblock %}

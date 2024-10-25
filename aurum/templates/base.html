@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/output.css' %}">
+        <link rel="icon" href="{% static 'assets/favicon.png' %}">
+        <title>{% block title %}{% endblock %} | Aurum</title>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+        <style>
+            .material-symbols-outlined {
+                font-family: 'Material Symbols Outlined';
+                font-weight: normal;
+                font-style: normal;
+                font-size: 2rem;
+                line-height: 1;
+                letter-spacing: normal;
+                text-transform: none;
+                display: inline-block;
+                white-space: nowrap;
+                word-wrap: normal;
+                direction: ltr;
+                -webkit-font-feature-settings: 'liga';
+                -webkit-font-smoothing: antialiased;
+            }
+        </style>
+    </head>
+    <body class="bg-neutral dark:bg-neutral_dark text-neutral_dark dark:text-neutral">
+        <div class="flex flex-col h-dvh">
+            <div class="flex w-screen p-6 bg-surface bg-opacity-90 dark:bg-opacity-75 dark:bg-surface_dark items-center justify-center ">
+                <div class="flex max-w-2xl w-full items-center justify-between">
+                    <a href="{% url 'index' %}">
+                        <img class="h-12 " src='{% static 'assets/header_logo_dark.png' %}'>
+                    </a>
+                    {% if user.is_authenticated %}
+                    <a>
+                        <span class="text-neutral material-symbols-outlined">
+                            add_box
+                        </span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% block body %}{% endblock %}
+        </div>
+        
+        <script>
+            {% block scripts %}{% endblock %}
+        </script>
+    </body>
+</html>
