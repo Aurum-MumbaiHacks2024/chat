@@ -8,9 +8,15 @@
     <!-- Message Area -->
     <div id="message-area" class="message-area my-4 w-full">
       <div  id="inner-message" class="flex text-lg flex-col gap-2.5 max-w-5xl mx-auto">
-          {% for message in chat.messages.all %}
-              {% include 'chat/partials/message.html' %}
-          {% endfor %}
+         <div class="flex flex-col gap-2 p-4 self-start max-w-2xl mr-3">
+            <div class="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">
+                    bolt
+                </span>
+                <p class="underline text-xl font-serif">Aurum</p>
+            </div>
+            <p class="font-normal border-0 text-gray-900 dark:text-white">Hi! I am Aurum. Please tell me if you are looking for long term or short term investment opportunities and your budget</p>
+        </div>
       </div>
     </div>
  </div>
@@ -18,7 +24,7 @@
 
  <div class="self-center flex w-full max-w-2xl p-2 justify-center">
    <form class="flex flex-row w-full max-w-3xl mb-2 h-14 px-2"
-      hx-post="{% url 'chat' chat.id %}" 
+      hx-post="{% url 'create_chat' %}" 
       hx-trigger="submit" 
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
       hx-target="#inner-message" 
@@ -35,7 +41,7 @@
  </div>
 <script>
    document.addEventListener('htmx:afterSwap', function(event) {
-      if (event.detail.pathInfo.requestPath === "{% url 'chat' chat.id %}") {
+      if (event.detail.pathInfo.requestPath === "{% url 'create_chat' %}") {
         document.getElementById('chat-input').value = '';
       }
       const chat = document.getElementById('message-box');

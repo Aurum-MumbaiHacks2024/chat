@@ -3,33 +3,25 @@
 {% block title %}Index{% endblock %}
 
 {% block body %}
-
-<div class="flex flex-col w-full h-full items-center justify-between p-6 py-20">
-    <p class="text-surface dark:text-neutral font-bold content-left text-4xl">
+<div class="flex flex-col w-full h-full items-center justify-between p-6">
+    
+    <div class="flex flex-col h-full mt-2 items-center max-w-lg w-full overflow-y-auto">
+    {% if request.user.is_authenticated %}
+        {% for chat in request.user.chats.all %}
+        <a href="{% url 'chat' chat.id %}" class="flex flex-col w-full p-3 rounded-lg bg-surface bg-opacity-30 mb-2 ">
+            <p class="font-bold text-2xl">{{chat.title}}</p>
+            {{chat.messages.last.content|slice:"180"}}...
+        </a>
+        {% endfor %}
+    {% else %}
+    <p class="text-surface dark:text-neutral font-bold h-20 content-left text-4xl my-6">
         Welcome to Aurum
     </p>
-    <div></div>
-    {% if request.user.is_authenticated %}
-    <form method="POST" action="{% url 'create_chat' %}" class="flex flex-col max-w-md w-full h-full items-center justify-center">
-        {% csrf_token %}
-        <div class="mb-4 w-full">
-            <label for="title" class="block text-2xl font-serif font-bold mb-2">Chat Title:</label>
-            <input type="text" id="title" name="title" class="shadow w-full appearance-none border rounded-full w-full p-4 text-gray-700 text-xl leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter chat title">
-        </div>
-        {% if error %}
-        <p class="text-red-500 w-full text-xs italic">{{ error }}</p>
-        {% endif %}
-        <div class="flex w-full items-center justify-between">
-            <button type="submit" class="w-full bg-blue-700 hover:bg-blue-700 text-white text-lg font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline">
-                Start Chat
-            </button>
-        </div>
-    </form>
-    {% else %}
-    <a href="{% url 'login' %}" class="flex items-center bg-opacity-60 justify-center text-2xl font-bold bg-accent w-80 h-16 rounded-xl dark:bg-accent_dark dark:text-white"> 
+    <a href="{% url 'login' %}" class="flex items-center bg-opacity-60 mt-6 justify-center text-2xl font-bold bg-accent w-80 h-16 rounded-xl dark:bg-accent_dark dark:text-white"> 
         Start Chatting Now!
     </a>
     {% endif %}
-</div>
+    </div>
 
+</div>
 {% endblock %}

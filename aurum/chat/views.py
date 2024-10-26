@@ -8,19 +8,56 @@ from core.models import *
 from .models import *
 from huggingface_hub import InferenceClient
 from .llm import parse_markdown
+import requests
+import json
+
+BASE_URL = "http://127.0.0.1:8000"  # Replace with your actual API URL
+
+def query_get_ipo(term):
+    if term == 'short':
+        term = 'short term'
+    elif term == 'long':
+        term = "long term"
+    else:
+        term = "neutral"
+    response = requests.post(f"{BASE_URL}/get_ipo", json={"term": term})
+    print(term)
+    if response.status_code == 200:
+        return response.json()  # Return the JSON response
+    else:
+        print(f"Error: {response.status_code} - {response.text}")
+        return None
+
+def query_get_mf(term, budget):
+    if term == 'short':
+        term = "Short-Term Schemes"
+        budget = "Low"
+    elif term == 'long':
+        term = "Long-Term Schemes"
+        budget = "High"
+    else:
+        term = "Long-Term Schemes"
+        budget = "Medium"
+    print(term, budget)
+    response = requests.post(f"{BASE_URL}/get_mf", json={"term": term, "budget": budget})
+    if response.status_code == 200:
+        return response.json()  # Return the JSON response
+    else:
+        print(f"Error: {response.status_code} - {response.text}")
+        return None
 
 class create_chat(View):
     def get(self, request):
-        return render(request, 'core/index.html')
+        return render(request, 'chat/start_chat.html')
     def post(self, request):
-        title = request.POST.get('title')
+        title = request.POST.get('content')
         user = request.user
 
         chat = Chat.objects.create(
             title = title,
             user = user
         )
-        prompt = "You are Aurum, a conversational chatbot designed to help users find investment opportunities based on their requirements. You must suggest IPOs and Mutual Funds to the user based on the context provided to you. Kindly refrain from answering if the question is not related to personal finance. You must not mention context to the user or talk about stocks outside of the context. If the context is empty, apologise to the user and tell him to try with different options."
+        prompt = "You are Aurum, a conversational chatbot designed to help users find investment opportunities based on their requirements. You must suggest IPOs and Mutual Funds to the user based on the context provided to you. Kindly refrain from answering if the question is not related to personal finance. You must not mention context to the user or talk about stocks outside of the context. If a user sends a non comprehensible message, kindly ask them to repeat. If the context is empty, apologise to the user and tell him to try with different options."
 
         Message.objects.create(
             chat = chat,
@@ -31,11 +68,54 @@ class create_chat(View):
         Message.objects.create(
             chat = chat,
             sender = "assistant",
-            content = f"Hi! I am Aurum. How may I help you today?",
-            content_html = f"Hi! I am Aurum. How may I help you today?"
+            content = "Hi! I am Aurum. Please tell me if you are looking for long term or short term investment opportunities and your budget.",
+            content_html = "Hi! I am Aurum. Please tell me if you are looking for long term or short term investment opportunities and your budget."
         )
 
-        return redirect('chat', chat.id)
+        Message.objects.create(
+            chat=chat,
+            sender = 'user',
+            content = title
+        )
+
+        
+
+        if 'long' in title.lower():
+            term = 'long'
+            budget = 'high'
+        elif 'short' in title.lower():
+            term = 'short'
+            budget = 'low'
+        else:
+            term = 'neutral'
+            budget = 'medium'
+
+        ipo_details = query_get_ipo(term)
+        mf_details = query_get_mf(term, budget)
+
+        context_data = {
+            "ipo_details": ipo_details,
+            "mf_details": mf_details
+        }
+
+        chat.context = json.dumps(context_data)  
+        chat.save()
+
+        Message.objects.create(
+            chat=chat,
+            sender = 'system',
+            content = chat.context
+        )
+
+        Message.objects.create(
+            chat=chat,
+            sender = 'assistant',
+            content = "Thinking..."
+        )
+
+        response = HttpResponse() 
+        response['HX-Redirect'] = f'/chat/{chat.id}'
+        return response 
 
 class chat(View):
     def get(self, request, chatid):
@@ -95,9 +175,10 @@ class chat(View):
             message["role"] = m.sender
             message["content"] = m.content
             message_history.append(message)
+        print(message_history)
         try:
             client = InferenceClient(
-                "microsoft/Phi-3-mini-4k-instruct",
+                "microsoft/Phi-3.5-mini-instruct",
                 token="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",
             )
             response = client.chat_completion(
