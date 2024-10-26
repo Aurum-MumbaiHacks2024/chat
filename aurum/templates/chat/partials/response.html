@@ -1,0 +1,20 @@
+<div  class="flex flex-col gap-2 p-4 max-w-2xl self-start mr-3">
+    <div class="flex items-center gap-1 dark:text-gray-400">
+        <span class="material-symbols-outlined dark:text-gray-400">
+            bolt
+        </span>
+        <p class="underline text-xl font-serif">Futura</p>
+    </div>
+    {% if message.content_html %}
+    <p class="text-lg font-normal border-0 text-gray-900 dark:text-white">{{ message.content_html | safe }}</p>
+    {% else %}
+    <p class="text-lg font-normal border-0 text-gray-900 dark:text-white">{{ message.content }}</p>
+    {% endif %}
+
+    <script>
+        var errorMessages = document.querySelectorAll('.error-message');
+        errorMessages.forEach(function(element) {
+            element.remove();
+        });
+    </script>
+</div>

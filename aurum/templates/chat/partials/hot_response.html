@@ -1,0 +1,25 @@
+<div id='response' class="flex flex-col gap-2 p-4 self-start max-w-2xl mr-3">
+    <div class="flex items-center gap-1 dark:text-gray-400">
+        <span class="material-symbols-outlined dark:text-gray-400">
+            bolt
+        </span>
+        <p class="underline text-xl font-serif">Futura</p>
+    </div>
+    <div class="flex flex-inline gap-1">
+        <lottie-player src="https://fonts.gstatic.com/s/e/notoemoji/latest/2728/lottie.json" background="transparent"  speed="1"  style="width: 24px; height: 24px;" autoplay loop></lottie-player>
+        <p class="text-lg font-normal border-0 text-gray-900 dark:text-white typewriter">{{ message.content }} <span id="typewriter"></span> </p>
+    </div>
+    <div
+        hx-get="{% url 'get_response' message.chat.id %}" 
+        hx-trigger="every 5s" 
+        hx-target="#response"
+        hx-swap="outerHTML"
+    ></div>
+    <script> 
+        new Typewriter('#typewriter', {
+            strings: ["This won't take long..."],
+            autoStart: true,   
+            loop: true,
+        });
+    </script>
+</div>

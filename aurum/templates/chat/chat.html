@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chat{% endblock %}
+
+{% block body %}
+<div id="message-box" class="h-full mx-1 px-3 flex-col justify-end overflow-y-auto">
+    <!-- Message Area -->
+    <div id="message-area" class="message-area my-4 w-full">
+      <div  id="inner-message" class="flex text-lg flex-col gap-2.5 max-w-5xl mx-auto">
+          {% for message in chat.messages.all %}
+              {% include 'chat/partials/message.html' %}
+          {% endfor %}
+      </div>
+    </div>
+ </div>
+
+
+ <div class="self-center flex w-full max-w-2xl p-2 justify-center">
+   <form class="flex flex-row w-full max-w-3xl mb-2 px-2"
+      hx-post="{% url 'chat' chat.id %}" 
+      hx-trigger="submit" 
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+      hx-target="#inner-message" 
+      hx-swap="beforeend"
+      autocomplete="off">   
+      <input type="text" id="chat-input" name="content" 
+      class="block pl-4 w-full flex flex-wrap bg-neutral text-neutral_dark rounded-s-full" 
+      placeholder="Type a message...">
+      <button type="submit" 
+      class="px-4 font-medium text-white bg-surface rounded-e-full">
+         <span class="material-symbols-outlined">send</span>
+      </button>
+   </form>
+ </div>
+<script>
+   document.addEventListener('htmx:afterSwap', function(event) {
+      if (event.detail.pathInfo.path === "/chat/{{chat.id}}/") {
+        document.getElementById('chat-input').value = '';
+      }
+      const chat = document.getElementById('message-box');
+      chat.scrollTo({
+      top: chat.scrollHeight,
+      behavior: 'smooth'
+      });
+   });
+   window.onload = function() {
+      const chat = document.getElementById('message-box');
+      chat.scrollTop = chat.scrollHeight
+   };
+</script>
+{% endblock %}
